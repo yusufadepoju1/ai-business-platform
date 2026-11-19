@@ -1,0 +1,208 @@
+{
+  "name": "AI Platform - Automated customer follow-ups",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "df997127-d323-43e1-ab4e-b2c52dab96d5",
+      "name": "Every 15 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://YOUR-APP-URL/api/webhooks/n8n/due-follow-ups",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Webhook-Secret",
+              "value": "YOUR_WEBHOOK_SECRET"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a7f74b77-dab9-454a-9978-96b1c4746614",
+      "name": "Get due follow-ups",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "id": "433082fe-88c6-4a95-b4b7-2a4c597f8236",
+      "name": "One item per follow-up",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "4eb4a210-ec3f-4146-8424-6d0ae4bb221b",
+              "leftValue": "={{ $json.customer_email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a7150ef3-4a8a-45dd-8a79-a24fe940eb02",
+      "name": "Has email?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "notifications@example.com",
+        "toEmail": "={{ $json.customer_email }}",
+        "subject": "=Following up on your enquiry",
+        "emailFormat": "text",
+        "text": "=Hi {{ $json.customer_name || 'there' }},\n\n{{ $json.action }}\n\nReply to this email if you have any questions.",
+        "options": {}
+      },
+      "id": "67f49c1b-24e0-49d8-9ae9-668fa242e687",
+      "name": "Email the customer",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        -80
+      ],
+      "notesInFlow": true,
+      "notes": "Select your SMTP credential and edit the addresses."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR-APP-URL/api/webhooks/n8n/follow-up-complete",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Webhook-Secret",
+              "value": "YOUR_WEBHOOK_SECRET"
+            }
+          ]
+        },
+        "options": {},
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ follow_up_id: $(\"One item per follow-up\").item.json.follow_up_id, note: \"Email sent by n8n\" }) }}"
+      },
+      "id": "13b01827-d655-4479-a711-f94e1eea4b58",
+      "name": "Mark follow-up done",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1300,
+        -80
+      ]
+    }
+  ],
+  "connections": {
+    "Every 15 minutes": {
+      "main": [
+        [
+          {
+            "node": "Get due follow-ups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get due follow-ups": {
+      "main": [
+        [
+          {
+            "node": "One item per follow-up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "One item per follow-up": {
+      "main": [
+        [
+          {
+            "node": "Has email?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has email?": {
+      "main": [
+        [
+          {
+            "node": "Email the customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email the customer": {
+      "main": [
+        [
+          {
+            "node": "Mark follow-up done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

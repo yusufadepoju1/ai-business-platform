@@ -1,0 +1,63 @@
+{
+  "name": "AI Platform - Human escalation alert",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-human-escalation",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "37ae9e5e-dc75-438d-893c-cabd8344c511",
+      "name": "Escalation webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "94d0fb67-26aa-41b4-892d-43b2e9f522de"
+    },
+    {
+      "parameters": {
+        "fromEmail": "notifications@example.com",
+        "toEmail": "team@example.com",
+        "subject": "=URGENT: conversation #{{ $json.body.data.conversation_id }} needs a human",
+        "emailFormat": "text",
+        "text": "=Reason: {{ $json.body.data.reason }}\nChannel: {{ $json.body.data.channel }}\nCustomer: {{ $json.body.data.customer_name }} {{ $json.body.data.customer_email }} {{ $json.body.data.customer_phone }}\n\nLast message:\n{{ $json.body.data.last_customer_message }}\n\nReply from the dashboard: Conversations.",
+        "options": {}
+      },
+      "id": "102433c4-e51e-4765-ba38-f713b121e038",
+      "name": "Email support team",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        0
+      ],
+      "notesInFlow": true,
+      "notes": "Select your SMTP credential and edit the addresses."
+    }
+  ],
+  "connections": {
+    "Escalation webhook": {
+      "main": [
+        [
+          {
+            "node": "Email support team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

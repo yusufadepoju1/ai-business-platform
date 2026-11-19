@@ -1,0 +1,63 @@
+{
+  "name": "AI Platform - New lead notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-new-lead",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "5cab209b-4c71-4fbf-9fcb-ca7cde069792",
+      "name": "New lead webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "44a68fd3-ce55-4c9d-90f0-131160e9dc23"
+    },
+    {
+      "parameters": {
+        "fromEmail": "notifications@example.com",
+        "toEmail": "team@example.com",
+        "subject": "=New lead: {{ $json.body.data.title }}",
+        "emailFormat": "text",
+        "text": "=A new lead was captured.\n\nName: {{ $json.body.data.customer_name }}\nEmail: {{ $json.body.data.customer_email }}\nPhone: {{ $json.body.data.customer_phone }}\nInterest: {{ $json.body.data.interest }}\nRequirements: {{ $json.body.data.requirements }}\nBudget: {{ $json.body.data.budget }}\nQualification: {{ $json.body.data.qualification }} (score {{ $json.body.data.score }})\nSuggested next step: {{ $json.body.data.recommended_action }}",
+        "options": {}
+      },
+      "id": "9f5dacb9-75dc-47bf-b571-660e595e015d",
+      "name": "Email sales team",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        0
+      ],
+      "notesInFlow": true,
+      "notes": "Select your SMTP credential and edit the addresses."
+    }
+  ],
+  "connections": {
+    "New lead webhook": {
+      "main": [
+        [
+          {
+            "node": "Email sales team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

@@ -1,0 +1,27 @@
+# Tested with Python 3.12 (3.11+ supported). Versions below are the ones the test-suite ran against.
+fastapi==0.164.0
+uvicorn[standard]==0.54.0
+gunicorn==23.0.0
+SQLAlchemy==2.1.9
+alembic==1.20.1
+psycopg2-binary==2.9.13
+pydantic==2.14.3
+pydantic-settings==2.16.3
+email-validator==2.4.0
+python-multipart==0.0.34
+python-jose[cryptography]==3.5.0
+cryptography==50.0.2
+passlib==1.7.4
+bcrypt==4.0.1
+httpx==0.28.1
+pypdf==6.17.0
+python-docx==1.2.0
+numpy==2.5.4
+faiss-cpu==1.16.0
+langchain-core==1.8.2
+langchain-groq==1.2.0
+langgraph==1.2.22
+# Neural embeddings (optional at runtime: EMBEDDING_PROVIDER=hashing uses a lightweight fallback).
+# On Render/Linux the CPU-only PyTorch wheel keeps the build small:
+--extra-index-url https://download.pytorch.org/whl/cpu
+sentence-transformers>=3.0.0

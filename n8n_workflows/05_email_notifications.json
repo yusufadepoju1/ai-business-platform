@@ -1,0 +1,63 @@
+{
+  "name": "AI Platform - Generic email notifications",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-email-notification",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "489d5535-375c-452b-a12d-c823d4e94d28",
+      "name": "Event webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "19d76c09-3dd9-4042-9e2b-0e096d7c9432"
+    },
+    {
+      "parameters": {
+        "fromEmail": "notifications@example.com",
+        "toEmail": "team@example.com",
+        "subject": "=[{{ $json.body.business_name }}] {{ $json.body.event }}",
+        "emailFormat": "text",
+        "text": "={{ JSON.stringify($json.body.data, null, 2) }}",
+        "options": {}
+      },
+      "id": "96b130b8-7e09-4f47-9fc8-2377a3f58bca",
+      "name": "Send notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        0
+      ],
+      "notesInFlow": true,
+      "notes": "Select your SMTP credential and edit the addresses."
+    }
+  ],
+  "connections": {
+    "Event webhook": {
+      "main": [
+        [
+          {
+            "node": "Send notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}
